@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+    <title></title>
+
+    <link href="lib/ionic/css/ionic.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+
+    <!-- IF using Sass (run gulp sass first), then uncomment below and remove the CSS includes above
+    <link href="css/ionic.app.css" rel="stylesheet">
+    -->
+
+    <!-- ionic/angularjs js -->
+    <script src="lib/ionic/js/ionic.bundle.js"></script>
+
+    <script type="text/javascript" src="lib/ngCordova/dist/ng-cordova.min.js"></script>
+
+    <!-- cordova script (this will be a 404 during development) -->
+    <script src="cordova.js"></script>
+
+    <!-- your app's js -->
+    <script src="js/app.js"></script>
+    <script src="js/equipment.js"></script>
+    <script src="js/trainee.js"></script>
+    <script src="js/employee.js"></script>
+  </head>
+  <body ng-app="starter">
+    <ion-nav-bar class="bar-balanced">
+      <ion-nav-back-button>
+      </ion-nav-back-button>
+    </ion-nav-bar>
+             
+    <ion-nav-view></ion-nav-view>
+
+    <script id="templates/app.html" type="text/ng-template">
+      <ion-tabs class="tabs-icon-top tabs-balanced">
+        <ion-tab title="Equipment" icon="ion-ios-americanfootball" href="#/app/equipment">
+          <ion-nav-view name="equipment-tab"></ion-nav-view>
+        </ion-tab>
+        <ion-tab title="Trainees" icon="ion-happy" href="#/app/trainee">
+          <ion-nav-view name="trainee-tab"></ion-nav-view>
+        </ion-tab>
+        <ion-tab title="Trainees" icon="ion-ribbon-b" href="#/app/employee">
+          <ion-nav-view name="employee-tab"></ion-nav-view>
+        </ion-tab>
+      </ion-tabs>
+    </script>
+
+    <script id="templates/equipment.html" type="text/ng-template">
+      <ion-view view-title="Equipment">
+          <ion-content class="padding">
+              <a href="#/app/equipment/checkout" class="button icon-left ion-ios-redo button-full button-calm">Check out</a>
+              <a href="#/app/equipment/checkin" class="button icon-left ion-ios-undo button-full button-assertive">Check in</a>
+              <a href="#/app/equipment/lookup" class="button icon-left ion-help-circled button-full button-energized">Look up</a>
+          </ion-content>
+      </ion-view>
+    </script>
+
+    <script id="templates/trainee.html" type="text/ng-template">
+      <ion-view view-title="Equipment">
+          <ion-content class="padding">
+              <a href="#/app/trainee/search" class="button icon-left ion-search button-full button-royal">Search</a>
+              <a href="#/app/trainee/read_card" class="button icon-left ion-card button-full button-energized">Read card</a>
+          </ion-content>
+      </ion-view>
+    </script>
+
+    <script id="templates/employee.html" type="text/ng-template">
+      <ion-view view-title="Equipment">
+          <ion-content class="padding">
+              <a href="#/app/employee/login" class="button icon-left ion-log-in button-full button-positive">Log in</a>
+              <a href="#/app/employee/logout" class="button icon-left ion-log-out button-full button-dark">Log out</a>
+              <a href="#/app/employee/patrol" class="button icon-left ion-flag button-full button-calm">Patrol checkpoint</a>
+          </ion-content>
+      </ion-view>
+    </script>
+
+    <script id="templates/checkout.html" type="text/ng-template">
+      <ion-view view-title="Check out">
+        <ion-content class="padding">
+          Check out
+        </ion-content>
+      </ion-view>
+    </script>
+
+    <script id="templates/checkin.html" type="text/ng-template">
+      <ion-view view-title="Check in">
+        <ion-content class="padding">
+          Check in
+        </ion-content>
+      </ion-view>
+    </script>
+
+    <script id="templates/lookup.html" type="text/ng-template">
+      <ion-view view-title="Look up">
+        <ion-content class="padding">
+          Look up
+        </ion-content>
+      </ion-view>
+    </script>
+
+    <script id="templates/search.html" type="text/ng-template">
+      <ion-view view-title="Search">
+        <ion-content class="padding">
+          Search
+        </ion-content>
+      </ion-view>
+    </script>
+
+    <script id="templates/read_card.html" type="text/ng-template">
+      <ion-view view-title="Read card">
+        <ion-content class="padding">
+          Read card
+        </ion-content>
+      </ion-view>
+    </script>
+
+    <script id="templates/login.html" type="text/ng-template">
+      <ion-view view-title="Log in">
+        <ion-content class="padding">
+          Log in
+        </ion-content>
+      </ion-view>
+    </script>
+
+    <script id="templates/logout.html" type="text/ng-template">
+      <ion-view view-title="Log out">
+        <ion-content class="padding">
+          Log out
+        </ion-content>
+      </ion-view>
+    </script>
+
+    <script id="templates/patrol.html" type="text/ng-template">
+      <ion-view view-title="Patrol">
+        <ion-content class="padding">
+          Patrol
+        </ion-content>
+      </ion-view>
+    </script>
+
+<!--       <ion-header-bar class="bar-stable">
+        <h1 class="title">Ionic Blank Starter</h1>
+      </ion-header-bar>
+      <ion-content>
+        <ion-list>
+          <ion-item ng-repeat="item in items">{{item}}</ion-item>
+        </ion-list>      
+         <button class="button" ng-click="scanBarcode()" style="margin: 1em">Scan</button>
+        <div>
+          <span ng-bind="results"></span>
+        </div>
+      </ion-content>
+ -->  </body>
+</html>
+
+
