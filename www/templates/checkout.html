@@ -1,0 +1,32 @@
+<ion-view view-title="Check out">
+    <ion-content class="padding">
+      <div class="list">
+        <div class="item item-divider">
+          <span>Trainee</span>
+        </div>
+        <a class="item item-icon-right" href="#/app/find_trainee">
+            <div ng-hide="checkout.trainee">
+                <span>Please select trainee</span>
+                <i class="icon ion-arrow-right-c"></i> 
+            </div>
+            <div ng-show="checkout.trainee">
+                <span ng-bind="checkout.trainee.fullname"></span>
+            </div>
+        </a>
+        <div class="item item-divider">
+          <span>Equipment</span>
+        </div>
+        <a class="item item-icon-right">
+            <i class="icon ion-arrow-right-c"></i> 
+            <span>Add Item</span>
+        </a>
+        <div class="item item-divider">
+          <span>Notes</span>
+        </div>
+        <div class="item item-input">
+          <textarea ng-model="checkout.notes" placeholder="Add notes here if needed" rows="4"></textarea>
+        </div>
+        <button class="button button-full button-positive" type="submit">Check out</button>
+      </div>
+    </ion-content>
+</ion-view>
