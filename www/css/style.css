@@ -2,3 +2,29 @@
 .item.checked {
     color: #999;
 }
+
+div.item.item-divider {
+    color: #999;
+}
+
+a.add-item {
+    background-color: #faffd4;
+    color: #333;
+}
+
+div.record.checkout {
+    color: #ff0000;
+}
+
+div.record.checkin {
+    color: #00ff00;
+}
+
+div.record > div.employee {
+    opacity: .5;
+    font-size: 0.8em;
+}
+
+div.record > div.date {
+    opacity: .5;
+}

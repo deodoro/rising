@@ -1,0 +1,20 @@
+<ion-view view-title="Transaction history">
+    <ion-content class="padding">
+      <div ng-repeat="h in history" class="list card">
+        <div class="item item-divider" ng-class="{ checkout: h.record_type == 'check out',  checkin: h.record_type == 'check in' }">
+            <span>{{ h.date | date:'short' }}</span>&nbsp;<span ng-bind="h.record_type"></span>
+        </div>
+            
+            <div class="item">Trainee: <span ng-bind="h.trainee.fullname"></span></div>
+            <div class="item">
+
+                <div ng-repeat="i in h.equipment"><span ng-bind="i.id"></span>&nbsp;<span ng-bind="i.description"></span></div>
+            </div>
+            <div class="item item-text-wrap" ng-show="h.notes"><span ng-bind="h.notes"></span></div>
+            <div class="item item-divider">registered by <span ng-bind="h.employee"></span></div>
+        </div>
+        <div ng-hide="history" class="item">
+            No records available
+        </div>
+    </ion-content>
+</ion-view>

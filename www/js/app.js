@@ -50,6 +50,15 @@ starter.config(function($stateProvider, $urlRouterProvider) {
         }
       }
     })
+    .state('app.history', {
+      url: "/equipment/history",
+      views: {
+        'equipment-tab': {
+          templateUrl: "templates/history.html",
+          controller: "HistoryCtrl"
+        }
+      }
+    })
     .state('app.trainee', {
       url: "/trainee",
       views: {
@@ -120,8 +129,17 @@ starter.config(function($stateProvider, $urlRouterProvider) {
         }
       }
     })
-    .state('app.add_item', {
+    .state('app.add_item_out', {
       url: "/add_item/:dir",
+      views: {
+        'equipment-tab': {
+          templateUrl: "templates/add_item.html",
+          controller: "AddItemCtrl"
+        }
+      }
+    })
+    .state('app.add_item_in', {
+      url: "/add_item/:dir/:trainee",
       views: {
         'equipment-tab': {
           templateUrl: "templates/add_item.html",
@@ -170,6 +188,9 @@ starter.config(function($stateProvider, $urlRouterProvider) {
         },
         get: function () {
             return _trainee;
+        },
+        clear: function() {
+          _trainee = null;
         }
     };
 })
@@ -187,14 +208,19 @@ starter.config(function($stateProvider, $urlRouterProvider) {
         setSelected: function(items) {
            _sel_items = items;
         },
-        getSelected() {
+        getSelected: function() {
           return _sel_items;
+        },
+        clear: function() {
+          _item = null;
+          _sel_items = null;          
         }
     };
 })
 .factory("$db", function() {
-   var equipment = [{ "id": 0, "description": "E 1", status: "in", history: [{date: "08/01/2016", record_type: "check out", trainee: "A 1"}] }, { "id": 1, "description": "E 2", status: "in" }, { "id": 2, "description": "E 3", status: "in" }, { "id": 3, "description": "E 4", status: "out" }, { "id": 4, "description": "E 5", status: "out" }, { "id": 5, "description": "E 6", status: "out" }];
-   var trainees = [{ "id": 0, "fullname": "A 1" }, { "id": 1, "fullname": "A 2" }, { "id": 2, "fullname": "A 3" }];
+   var trainees = [{ "id": 0, "fullname": "Johnny Ng" }, { "id": 1, "fullname": "Ross Lee" }, { "id": 2, "fullname": "Jose de Oliveira" }];
+   var equipment = [{ "id": 0, "description": "E 1", status: "in" }, { "id": 1, "description": "E 2", status: "in" }, { "id": 2, "description": "E 3", status: "in" }, { "id": 3, "description": "E 4", status: "out", trainee: trainees[0], history: [{date: new Date(), record_type: "checked out", trainee: trainees[0], employee: "test"}]}, { "id": 4, "description": "E 5", status: "out", trainee: trainees[0] }, { "id": 5, "description": "E 6", status: "out", trainee: trainees[1] }];
+   var history = [];
 
    return {
       allEquipment: function() {
@@ -209,11 +235,42 @@ starter.config(function($stateProvider, $urlRouterProvider) {
       equipmentById: function(id) {
         return _.find(equipment, function(i) { return i.id == id; })
       },
+      history: function() {
+        return history;
+      },
       trainees: function() {
         return trainees;
       },
       traineeById: function(id) {
         return _.find(trainees, function(i) { return i.id == id; });
+      }, 
+      equipmentWith: function(trainee_id) {
+        return _.filter(equipment, function(i) { return i.trainee && i.trainee.id == trainee_id; }) || [];
+      },
+      createCheckout: function(checkout, username) {
+        checkout.equipment.forEach(function(i) {
+          i.status = "out";
+          i.history = i.history || [];
+          i.trainee = checkout.trainee;
+          i.history.push({ date: checkout.date, record_type: "checked out", trainee: checkout.trainee, employee: username });
+        });        
+        history.push({ record_type: "check out", date: checkout.date, notes: checkout.notes, equipment: checkout.equipment, trainee: checkout.trainee, employee: username })
+      },
+      createCheckin: function(checkin, username) {
+        checkin.equipment.forEach(function(i) {
+          i.status = "in";
+          i.history = i.history || [];
+          i.trainee = null;
+          i.history.push({ date: checkin.date, record_type: "checked in", trainee: checkin.trainee, employee: username });
+          history.push({ record_type: "check in", date: checkin.date, notes: checkin.notes, equipment: checkin.equipment, trainee: checkin.trainee, employee: username })
+        });        
       }
    }
+})
+.factory("$auth", function() {
+  return {
+    username: function() {
+      return "Johnny Ng";
+    }
+  };
 });

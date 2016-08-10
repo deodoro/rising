@@ -4,5 +4,4 @@ starter.controller("SearchCtrl", function($scope, $db, $rootScope) {
     console.log("Read");
 }).controller("TraineeInfoCtrl", function($scope, $db, $stateParams) {
     $scope.trainee = $db.traineeById($stateParams.id);
-    console.dir($scope.trainee);
 });

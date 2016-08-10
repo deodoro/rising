@@ -19,9 +19,9 @@
         <div class="item item-divider">
           <span>History</span>
         </div>
-        <div ng-repeat="h in item.history" class="item">
-            <span ng-bind="h.date"></span>
-            <span ng-bind="h.record_type"></span> by <span ng-bind="h.trainee"></span>
+        <div ng-repeat="h in item.history" class="item record" ng-class="{ checkout: h.record_type == 'checked out',  checkin: h.record_type == 'checked in' }">
+            <div><span ng-bind="h.record_type"></span> by <span ng-bind="h.trainee.fullname"></span></div>            
+            <div class='employee'>registered by <span ng-bind="h.employee"></span> at {{ h.date | date:'short' }}</div>
         </div>
         <div ng-hide="item.history" class="item">
             No records for this item
