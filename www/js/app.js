@@ -218,9 +218,9 @@ starter.config(function($stateProvider, $urlRouterProvider) {
     };
 })
 .factory("$db", function() {
-   var trainees = [{ "id": 0, "fullname": "Johnny Ng" }, { "id": 1, "fullname": "Ross Lee" }, { "id": 2, "fullname": "Jose de Oliveira" }];
+   var trainees = [{ "id": 0, "fullname": "Johnny Ng", "tag": "yellow" }, { "id": 1, "fullname": "Ross Lee", "tag": "red" }, { "id": 2, "fullname": "Jose de Oliveira", "tag": "green" }];
    var equipment = [{ "id": 0, "description": "E 1", status: "in" }, { "id": 1, "description": "E 2", status: "in" }, { "id": 2, "description": "E 3", status: "in" }, { "id": 3, "description": "E 4", status: "out", trainee: trainees[0], history: [{date: new Date(), record_type: "checked out", trainee: trainees[0], employee: "test"}]}, { "id": 4, "description": "E 5", status: "out", trainee: trainees[0] }, { "id": 5, "description": "E 6", status: "out", trainee: trainees[1] }];
-   var history = [];
+   var history = [{date: new Date(), record_type: "check out", trainee: trainees[0], employee: "test", equipment: [equipment[0]]}, {date: new Date(), record_type: "check in", trainee: trainees[0], employee: "test", equipment: [equipment[0]]}];
 
    return {
       allEquipment: function() {
@@ -237,6 +237,9 @@ starter.config(function($stateProvider, $urlRouterProvider) {
       },
       history: function() {
         return history;
+      },
+      historyByTrainee: function(trainee_id) {
+        return _.filter(history, function(i) { return i.trainee.id == trainee_id; });
       },
       trainees: function() {
         return trainees;

@@ -2,7 +2,7 @@
     <ion-content class="padding">
       <div ng-repeat="h in history" class="list card">
         <div class="item item-divider" ng-class="{ checkout: h.record_type == 'check out',  checkin: h.record_type == 'check in' }">
-            <span>{{ h.date | date:'short' }}</span>&nbsp;<span ng-bind="h.record_type"></span>
+            <span>{{ h.date | date:'short' }}</span>&nbsp;<span ng-bind="h.record_type" ng-class="{ calm: h.record_type == 'check out',  assertive: h.record_type == 'check in' }"></span>
         </div>
             
             <div class="item">Trainee: <span ng-bind="h.trainee.fullname"></span></div>
