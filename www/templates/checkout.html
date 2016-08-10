@@ -16,9 +16,15 @@
         <div class="item item-divider">
           <span>Equipment</span>
         </div>
-        <a class="item item-icon-right">
+        <div class="item item-icon-right" ng-repeat="e in checkout.equipment">
+            <a ng-click="removeItem(e)" class="icon ion-close">
+            </a>
+            <span ng-bind="e.id"></span>
+            <span ng-bind="e.description"></span>
+        </div>
+        <a class="item item-icon-right" href="#/app/add_item/out">
             <i class="icon ion-arrow-right-c"></i> 
-            <span>Add Item</span>
+            <span>Add item</span>
         </a>
         <div class="item item-divider">
           <span>Notes</span>

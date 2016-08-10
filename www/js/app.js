@@ -1,9 +1,12 @@
 // Ionic Starter App
 
-// angular.module is a global place for creating, registering and retrieving Angular modules
-// 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
-// the 2nd parameter is an array of 'requires'
-var starter = angular.module('starter', ['ionic', 'ngCordova']);
+/* Make lodash an injectable service */
+angular.module('lodash', [])  
+.factory('_', ['$window', function($window) {
+    return $window._; // assumes underscore has already been loaded on the page
+}]);
+
+var starter = angular.module('starter', ['ionic', 'ngCordova', 'lodash']);
 
 starter.config(function($stateProvider, $urlRouterProvider) {
   $stateProvider
@@ -116,6 +119,33 @@ starter.config(function($stateProvider, $urlRouterProvider) {
           controller: "FindTraineeCtrl"
         }
       }
+    })
+    .state('app.add_item', {
+      url: "/add_item/:dir",
+      views: {
+        'equipment-tab': {
+          templateUrl: "templates/add_item.html",
+          controller: "AddItemCtrl"
+        }
+      }
+    })
+    .state('app.item_status', {
+      url: "/item_status/:id",
+      views: {
+        'equipment-tab': {
+          templateUrl: "templates/item_status.html",
+          controller: "StatusItemCtrl"
+        }
+      }
+    })
+    .state('app.trainee_info', {
+      url: "/trainee_info/:id",
+      views: {
+        'trainee-tab': {
+          templateUrl: "templates/trainee_info.html",
+          controller: "TraineeInfoCtrl"
+        }
+      }
     });
 
   $urlRouterProvider.otherwise("/app/equipment");
@@ -131,61 +161,6 @@ starter.config(function($stateProvider, $urlRouterProvider) {
     }
   });
 })
-.directive('searchBar', [function () {
-  return {
-    scope: {
-      ngModel: '='
-    },
-    require: ['^ionNavBar', '?ngModel'],
-    restrict: 'E',
-    replace: true,
-    template: '<ion-nav-buttons side="right">'+
-            '<div class="searchBar">'+
-              '<div class="searchTxt" ng-show="ngModel.show">'+
-                  '<div class="bgdiv"></div>'+
-                  '<div class="bgtxt">'+
-                    '<input type="text" placeholder="Procurar..." ng-model="ngModel.txt">'+
-                  '</div>'+
-                '</div>'+
-                '<i class="icon placeholder-icon" ng-click="ngModel.txt=\'\';ngModel.show=!ngModel.show"></i>'+
-            '</div>'+
-          '</ion-nav-buttons>',
-    
-    compile: function (element, attrs) {
-      var icon=attrs.icon
-          || (ionic.Platform.isAndroid() && 'ion-android-search')
-          || (ionic.Platform.isIOS()     && 'ion-ios7-search')
-          || 'ion-search';
-      angular.element(element[0].querySelector('.icon')).addClass(icon);
-      
-      return function($scope, $element, $attrs, ctrls) {
-        var navBarCtrl = ctrls[0];
-        $scope.navElement = $attrs.side === 'right' ? navBarCtrl.rightButtonsElement : navBarCtrl.leftButtonsElement;
-        
-      };
-    },
-    controller: ['$scope','$ionicNavBarDelegate', function($scope,$ionicNavBarDelegate){
-      var title, definedClass;
-      $scope.$watch('ngModel.show', function(showing, oldVal, scope) {
-        if(showing!==oldVal) {
-          if(showing) {
-            if(!definedClass) {
-              var numicons=$scope.navElement.children().length;
-              angular.element($scope.navElement[0].querySelector('.searchBar')).addClass('numicons'+numicons);
-            }
-            
-            title = $ionicNavBarDelegate.getTitle();
-            $ionicNavBarDelegate.setTitle('');
-          } else {
-            $ionicNavBarDelegate.setTitle(title);
-          }
-        } else if (!title) {
-          title = $ionicNavBarDelegate.getTitle();
-        }
-      });
-    }]
-  };
-}])
 .factory('TraineeInfo', function () {
     var _trainee = null;
  
@@ -197,4 +172,48 @@ starter.config(function($stateProvider, $urlRouterProvider) {
             return _trainee;
         }
     };
+})
+.factory('ItemInfo', function () {
+    var _item = null;
+    var _sel_items = null;
+ 
+    return {
+        set: function (item) {
+            _item = item;
+        },
+        get: function () {
+            return _item;
+        },
+        setSelected: function(items) {
+           _sel_items = items;
+        },
+        getSelected() {
+          return _sel_items;
+        }
+    };
+})
+.factory("$db", function() {
+   var equipment = [{ "id": 0, "description": "E 1", status: "in", history: [{date: "08/01/2016", record_type: "check out", trainee: "A 1"}] }, { "id": 1, "description": "E 2", status: "in" }, { "id": 2, "description": "E 3", status: "in" }, { "id": 3, "description": "E 4", status: "out" }, { "id": 4, "description": "E 5", status: "out" }, { "id": 5, "description": "E 6", status: "out" }];
+   var trainees = [{ "id": 0, "fullname": "A 1" }, { "id": 1, "fullname": "A 2" }, { "id": 2, "fullname": "A 3" }];
+
+   return {
+      allEquipment: function() {
+        return equipment;
+      },
+      availableEquipment: function() {
+        return _.filter(equipment, function(i) { return i.status == "in"; });
+      },
+      checkedOutEquipment: function() {
+        return _.filter(equipment, function(i) { return i.status == "out"; });
+      },
+      equipmentById: function(id) {
+        return _.find(equipment, function(i) { return i.id == id; })
+      },
+      trainees: function() {
+        return trainees;
+      },
+      traineeById: function(id) {
+        return _.find(trainees, function(i) { return i.id == id; });
+      }
+   }
 });

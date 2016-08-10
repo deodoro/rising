@@ -4,7 +4,7 @@
           <div class="item-input-inset" style="line-height: 2em; padding: 0.25em 0.5em">
             <div class="item-input-wrapper">
               <i class="icon ion-ios-search placeholder-icon"></i>
-              <input type="search" style="width: 100%" placeholder="Select trainee or scan tag">
+              <input type="search" style="width: 100%" placeholder="Select equipment or scan barcode">
             </div>
           </div>
         </ion-nav-title> 
@@ -15,8 +15,9 @@
       </ion-nav-bar>
       <ion-content class="padding">
       <div class="list">
-        <a class="item" ng-repeat="t in trainees" ng-href="#/app/trainee_info/{{t.id}}">
-          <span ng-bind="t.fullname"></span>
+        <a class="item" ng-repeat="e in equipment" ng-click="clickEquipment(e)">
+          <span ng-bind="e.id"></span>
+          <span ng-bind="e.description"></span>
         </a>
       </div>
     </ion-content>

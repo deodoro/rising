@@ -1,5 +1,38 @@
 <ion-view view-title="Check in">
     <ion-content class="padding">
-      Check in
+      <div class="list">
+        <div class="item item-divider">
+          <span>Trainee</span>
+        </div>
+        <a class="item item-icon-right" href="#/app/find_trainee">
+            <div ng-hide="checkin.trainee">
+                <span>Select trainee or select equipment below to proceed</span>
+                <i class="icon ion-arrow-right-c"></i> 
+            </div>
+            <div ng-show="checkin.trainee">
+                <span ng-bind="checkin.trainee.fullname"></span>
+            </div>
+        </a>
+        <div class="item item-divider">
+          <span>Equipment</span>
+        </div>
+        <div class="item item-icon-right" ng-repeat="e in checkin.equipment">
+            <a ng-click="removeItem(e)" class="icon ion-close">
+            </a>
+            <span ng-bind="e.id"></span>
+            <span ng-bind="e.description"></span>
+        </div>
+        <a class="item item-icon-right" href="#/app/add_item/in">
+            <i class="icon ion-arrow-right-c"></i> 
+            <span>Select item</span>
+        </a>
+        <div class="item item-divider">
+          <span>Notes</span>
+        </div>
+        <div class="item item-input">
+          <textarea ng-model="checkin.notes" placeholder="Add notes here if needed" rows="4"></textarea>
+        </div>
+        <button class="button button-full button-assertive" type="submit">Check in</button>
+      </div>
     </ion-content>
 </ion-view>

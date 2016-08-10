@@ -1,5 +1,14 @@
 <ion-view view-title="Patrol">
     <ion-content class="padding">
-      Patrol
+        <div class="list">
+            <h3>Please touch the checkpoint and wait for confirmation</h3>
+            <div class="item item-divider">
+              <span>Latest records</span>
+            </div>
+            <div class="item" ng-repeat="r in employee.records">
+                <span ng-bind="r.date"></span>
+                <span ng-bind="r.location"></span>
+            </div>
+        </div>    
     </ion-content>
 </ion-view>

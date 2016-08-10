@@ -21,6 +21,7 @@
     <script src="cordova.js"></script>
 
     <!-- your app's js -->
+    <script src="lib/external/lodash.min.js"></script>
     <script src="js/app.js"></script>
     <script src="js/equipment.js"></script>
     <script src="js/trainee.js"></script>
@@ -39,10 +40,10 @@
         <ion-tab title="Equipment" icon="ion-ios-americanfootball" href="#/app/equipment">
           <ion-nav-view name="equipment-tab"></ion-nav-view>
         </ion-tab>
-        <ion-tab title="Trainees" icon="ion-happy" href="#/app/trainee">
+        <ion-tab title="Trainee" icon="ion-happy" href="#/app/trainee">
           <ion-nav-view name="trainee-tab"></ion-nav-view>
         </ion-tab>
-        <ion-tab title="Trainees" icon="ion-ribbon-b" href="#/app/employee">
+        <ion-tab title="Employee" icon="ion-ribbon-b" href="#/app/employee">
           <ion-nav-view name="employee-tab"></ion-nav-view>
         </ion-tab>
       </ion-tabs>
@@ -62,7 +63,6 @@
       <ion-view view-title="Trainee">
           <ion-content class="padding">
               <a href="#/app/trainee/search" class="button icon-left ion-search button-full button-royal">Search</a>
-              <a href="#/app/trainee/read_card" class="button icon-left ion-card button-full button-energized">Read card</a>
           </ion-content>
       </ion-view>
     </script>
@@ -84,20 +84,7 @@
         </ion-content>
       </ion-view>
     </script>
-
-<!--       <ion-header-bar class="bar-stable">
-        <h1 class="title">Ionic Blank Starter</h1>
-      </ion-header-bar>
-      <ion-content>
-        <ion-list>
-          <ion-item ng-repeat="item in items">{{item}}</ion-item>
-        </ion-list>      
-         <button class="button" ng-click="scanBarcode()" style="margin: 1em">Scan</button>
-        <div>
-          <span ng-bind="results"></span>
-        </div>
-      </ion-content>
- -->  </body>
+  </body>
 </html>
 
 

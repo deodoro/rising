@@ -1,5 +1,11 @@
 <ion-view view-title="Look up">
     <ion-content class="padding">
-      Look up
+      <div class="list">
+        <a class="item item-icon-right" ng-href="#/app/item_status/{{i.id}}" ng-repeat="i in equipment" ng-class="{checked: i.status=='out'}">
+            <span ng-bind="i.id"></span>
+            <span ng-bind="i.description"></span>
+            <i class="icon ion-checkmark" ng-hide="i.status=='in'"></i> 
+        </a>
+      </div>
     </ion-content>
 </ion-view>
