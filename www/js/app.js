@@ -213,7 +213,7 @@ starter.config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider
     };
 })
 .factory("$db", function() {
-   var trainees = [{ "id": 0, "fullname": "Johnny Ng", "tag": "yellow" }, { "id": 1, "fullname": "Ross Lee", "tag": "red" }, { "id": 2, "fullname": "Jose de Oliveira", "tag": "green" }];
+   var trainees = [{ "id": 0, "fullname": "Johnny Ng", "tag": "yellow", "tag_id": "84d3109e" }, { "id": 1, "fullname": "Ross Lee", "tag": "red", "tag_id": "e426109e" }, { "id": 2, "fullname": "Jose de Oliveira", "tag": "green", "tag_id": "448f0d9e" }];
    var equipment = [{ "id": 0, "description": "E 1", status: "in" }, { "id": 1, "description": "E 2", status: "in" }, { "id": 2, "description": "E 3", status: "in" }, { "id": 3, "description": "E 4", status: "out", trainee: trainees[0], history: [{date: new Date(), record_type: "checked out", trainee: trainees[0], employee: "test"}]}, { "id": 4, "description": "E 5", status: "out", trainee: trainees[0] }, { "id": 5, "description": "E 6", status: "out", trainee: trainees[1] }];
    var history = [{date: new Date(), record_type: "check out", trainee: trainees[0], employee: "test", equipment: [equipment[0]]}, {date: new Date(), record_type: "check in", trainee: trainees[0], employee: "test", equipment: [equipment[0]]}];
 
@@ -241,6 +241,9 @@ starter.config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider
       },
       traineeById: function(id) {
         return _.find(trainees, function(i) { return i.id == id; });
+      }, 
+      traineeByTagId: function(id) {
+        return _.find(trainees, function(i) { return i.tag_id == id; });
       }, 
       equipmentWith: function(trainee_id) {
         return _.filter(equipment, function(i) { return i.trainee && i.trainee.id == trainee_id; }) || [];
@@ -275,15 +278,13 @@ starter.config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider
 .factory('nfcService', function ($rootScope, $ionicPlatform) {
     var tag = null;
 
-    $ionicPlatform.ready(function() {
-        nfc.addTagDiscoveredListener(function(e) {
-            var x = nfc.bytesToHexString(e.tag.id);
-            $rootScope.$apply(function() {
-                tag = x;
-            });
-            $rootScope.$broadcast("tag", {id: x});
-        });
-    });
+    if (typeof(nfc) != "undefined") {
+      $ionicPlatform.ready(function() {
+          nfc.addTagDiscoveredListener(function(e) {
+              $rootScope.$broadcast("tag", {id: nfc.bytesToHexString(e.tag.id)});
+          });
+      });
+    }
 
     return { };
 });

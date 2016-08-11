@@ -1,9 +1,4 @@
 starter.controller("CheckoutCtrl", function($scope, $http, $db, $rootScope, $auth, TraineeInfo, ItemInfo, _, nfcService) {
-
-    $scope.$on("tag", function(event, data) {
-        alert(JSON.stringify(data));
-    });
-
     $scope.checkout = {
         'trainee': null,
         'equipment': [],
@@ -13,6 +8,14 @@ starter.controller("CheckoutCtrl", function($scope, $http, $db, $rootScope, $aut
     $scope.receipt = false;
     TraineeInfo.clear();
     ItemInfo.clear();
+    $scope.$on("tag", function(event, data) {
+        var lookup = $db.traineeByTagId(data.id);
+        if (lookup != null && lookup != $scope.checkout.trainee) {
+            $scope.$apply(function() {
+                $scope.checkout.trainee = lookup;
+            });
+        }
+    });
     $scope.$on("$ionicView.enter", function(){
       if (TraineeInfo.get() != null && $scope.checkout.trainee != TraineeInfo.get()) {
         $scope.checkout.trainee = TraineeInfo.get();
@@ -62,6 +65,17 @@ starter.controller("CheckoutCtrl", function($scope, $http, $db, $rootScope, $aut
         ItemInfo.clear();
         ItemInfo.setSelected(_.map($scope.checkin.equipment, function(i) { return i.id; }));
       }
+    });
+    $scope.$on("tag", function(event, data) {
+        var lookup = $db.traineeByTagId(data.id);
+        if (lookup != null && lookup != $scope.checkin.trainee) {
+            $scope.$apply(function() {
+                $scope.checkin.trainee = lookup;
+                $scope.checkin.equipment = $db.equipmentWith(lookup.id);
+                ItemInfo.clear();
+                ItemInfo.setSelected(_.map($scope.checkin.equipment, function(i) { return i.id; }));
+            });
+        }
     });
     $scope.removeItem = function(item) {
        $scope.checkin.equipment = _.reject($scope.checkin.equipment, {id: item.id});

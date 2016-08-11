@@ -1,8 +1,7 @@
 <ion-view view-title="Trainee info">
     <ion-content class="padding">
       <div class="list">
-        <div class="item item-separator">
-            Tag
+        <div class="item"  ng-style="{'background-color': trainee.tag}">
         </div>
         <div class="item item-input item-stacked-label">
             <span class="input-label">Id</span>
@@ -11,6 +10,16 @@
         <div class="item item-input item-stacked-label">
             <span class="input-label">Name</span>
             <span ng-bind="trainee.fullname"></span>
+        </div>
+        <div class="item" ng-hide="equipment.length > 0">
+            This trainee has no equipment checked out
+        </div>
+        <div class="item item-divider" ng-show="equipment.length > 0">
+            Currently checked out
+        </div>
+        <div class="item" ng-repeat="e in equipment">
+            <span ng-bind="e.id"></span>
+            <span ng-bind="e.description"></span>
         </div>
         <div class="list card" ng-repeat="h in history">
             <div class="item item-divider">

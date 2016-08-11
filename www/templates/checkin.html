@@ -7,7 +7,7 @@
             </div>
             <a class="item item-icon-right" href="#/app/find_trainee">
                 <div ng-hide="checkin.trainee">
-                    <span>Select trainee or select equipment below to proceed</span>
+                    <span>Select trainee, present card or equipment below to proceed</span>
                     <i class="icon ion-arrow-right-c"></i> 
                 </div>
                 <div ng-show="checkin.trainee">
@@ -27,6 +27,9 @@
                 <i class="icon ion-arrow-right-c"></i> 
                 <span>Select item</span>
             </a>
+            <div class="item" ng-show="(!addSelection() && checkin.equipment.length == 0)">
+                This trainee holds no items to check in
+            </div>
             <div class="item item-divider">
               <span>Notes</span>
             </div>
