@@ -181,7 +181,11 @@ starter.controller("CheckoutCtrl", function($scope, $http, $db, $rootScope, $aut
     }
     $scope.scanBarcode = function() {
         $cordovaBarcodeScanner.scan().then(function(imageData) {
-            alert(imageData.format);
+            var item = _.find(all_equipment, function(i) { return i._id.$oid == imageData.text; });
+            if (item != null) {
+                ItemInfo.set(item);
+                $rootScope.$ionicGoBack();
+            }
         });
     };
     $scope.$watch("search.term", function(newValue, oldValue) {
