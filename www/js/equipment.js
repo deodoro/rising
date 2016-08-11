@@ -114,8 +114,10 @@ starter.controller("CheckoutCtrl", function($scope, $http, $db, $rootScope, $aut
     };
 }).controller("LookupCtrl", function($scope, $http, $db, $timeout) {
     var promise = null;
+    var all_equipment = null;
     $scope.search = { term: ""};
     $db.allEquipment().then(function(data) {
+        all_equipment = data;
         $scope.equipment = data;
     });
     $scope.clearSearch = function() {
@@ -125,15 +127,37 @@ starter.controller("CheckoutCtrl", function($scope, $http, $db, $rootScope, $aut
     $scope.$watch("search.term", function(newValue, oldValue) {
         if (promise != null) 
             $timeout.cancel(promise);
-        promise = $timeout(function() {
-            $db.allEquipment().then(function(data) {                
-                $scope.equipment = _.filter(data, function(i) { return _.includes(i.description.toUpperCase(), $scope.search.term.toUpperCase()); });
-            });
-            promise = null;
-        }, 300);
+        if ($scope.search.term == "")
+            $scope.equipment = all_equipment;
+        else {
+            promise = $timeout(function() {
+                $scope.equipment = _.filter(all_equipment, function(i) { return _.includes(i.description.toUpperCase(), $scope.search.term.toUpperCase()); });
+                promise = null;
+            }, 300);
+        }
     });
-}).controller("FindTraineeCtrl", function($scope, $rootScope, $db, TraineeInfo) {
+}).controller("FindTraineeCtrl", function($scope, $rootScope, $db, TraineeInfo, $timeout) {
+    var promise = null;
+    var all_trainees = null;
+    $scope.search = { term: ""};
+    $scope.clearSearch = function() {
+        $scope.search.term = "";
+    }
+    $scope.$watch("search.term", function(newValue, oldValue) {
+        if (promise != null) 
+            $timeout.cancel(promise);
+        if ($scope.search.term == "")
+            $scope.trainees = all_trainees;
+        else {
+            promise = $timeout(function() {
+                $scope.trainees = _.filter(all_trainees, function(i) { return _.includes(i.fullname.toUpperCase(), $scope.search.term.toUpperCase()); });
+                promise = null;
+            }, 300);
+        }
+    });
+
     $db.trainees().then(function(data) {
+        all_trainees = data;
         $scope.trainees = data;
     });
     $scope.clickTrainee = function(trainee) {
@@ -148,18 +172,47 @@ starter.controller("CheckoutCtrl", function($scope, $http, $db, $rootScope, $aut
             }
         });
     });    
-}).controller("AddItemCtrl", function($scope, $rootScope, $stateParams, $db, ItemInfo, _) {
+}).controller("AddItemCtrl", function($scope, $rootScope, $stateParams, $db, $cordovaBarcodeScanner, $timeout, ItemInfo, _) {
+    var promise = null;
+    var all_equipment = null;
+    $scope.search = { term: ""};
+    $scope.clearSearch = function() {
+        $scope.search.term = "";
+    }
+    $scope.scanBarcode = function() {
+        $cordovaBarcodeScanner.scan().then(function(imageData) {
+            alert(imageData.format);
+        });
+    };
+    $scope.$watch("search.term", function(newValue, oldValue) {
+        if (promise != null) 
+            $timeout.cancel(promise);
+        if ($scope.search.term == "")
+            $scope.equipment = all_equipment;
+        else {
+            promise = $timeout(function() {
+                $scope.equipment = _.filter(all_equipment, function(i) { return _.includes(i.description.toUpperCase(), $scope.search.term.toUpperCase()); });
+                promise = null;
+            }, 300);
+        }
+    });
     if ($stateParams.dir == "in") {
         var equipment = [];
         if ($stateParams.trainee == "all")
-            $db.checkedOutEquipment().then(function(data) { equipment = data; });
+            $db.checkedOutEquipment().then(function(data) { 
+                all_equipment = _.reject(data, function(i) { return _.includes(ItemInfo.getSelected(), i.id); });
+                $scope.equipment = all_equipment;
+            });
         else
-            $db.equipmentWith($stateParams.trainee).then(function(data) { equipment = data; });
-        $scope.equipment = _.reject(equipment, function(i) { return _.includes(ItemInfo.getSelected(), i.id); });
+            $db.equipmentWith($stateParams.trainee).then(function(data) { 
+                all_equipment = _.reject(data, function(i) { return _.includes(ItemInfo.getSelected(), i.id); });
+                $scope.equipment = all_equipment;
+            });
     }
     else {
         $db.availableEquipment().then(function(data) {
-            $scope.equipment = _.reject(data, function(i) { return _.includes(ItemInfo.getSelected(), i.id); });
+            all_equipment = _.reject(data, function(i) { return _.includes(ItemInfo.getSelected(), i.id); });
+            $scope.equipment = all_equipment;
         });
     }
     $scope.clickEquipment = function(equipment) {
@@ -175,17 +228,3 @@ starter.controller("CheckoutCtrl", function($scope, $http, $db, $rootScope, $aut
         $scope.history = data;
     });
 });
-
-
-// starter.controller("equipment", function($scope, $cordovaBarcodeScanner) {
- //    $scope.results = "not run";
- 
- //    $scope.scanBarcode = function() {
- //        $scope.results = "running";
- //        $cordovaBarcodeScanner.scan().then(function(imageData) {
- //            $scope.results = "format: " + imageData.format;
- //        }, function(error) {
- //            $scope.results = "An error happened -> " + error;
- //        });
- //    };
- // 

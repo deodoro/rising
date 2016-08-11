@@ -1,24 +1,27 @@
 <ion-view>
-     <ion-nav-bar class="bar-balanced">
-        <ion-nav-title>
-          <div class="item-input-inset" style="line-height: 2em; padding: 0.25em 0.5em">
-            <div class="item-input-wrapper">
-              <i class="icon ion-ios-search placeholder-icon"></i>
-              <input type="search" style="width: 100%" placeholder="Select equipment or scan barcode">
-            </div>
+  <ion-nav-bar class="bar-balanced">
+      <ion-nav-title>
+        <div class="item-input-inset" style="line-height: 2em; padding: 0.25em 0.5em">
+          <div class="item-input-wrapper">
+            <i class="icon ion-ios-search placeholder-icon"></i>
+            <input type="search" style="width: 100%" placeholder="Select equipment" ng-model="search.term">
           </div>
-        </ion-nav-title> 
-        <ion-nav-back-button></ion-nav-back-button>
-        <ion-nav-buttons side="right">
-          <button class="button button-clear">Clear</button>
-        </ion-nav-buttons>
-      </ion-nav-bar>
-      <ion-content class="padding">
+        </div>
+      </ion-nav-title> 
+      <ion-nav-back-button></ion-nav-back-button>
+      <ion-nav-buttons side="right">
+        <button class="button button-clear" ng-click="clearSearch()">Clear</button>
+      </ion-nav-buttons>
+  </ion-nav-bar>
+  <ion-content class="padding">
       <div class="list">
+        <a class="item" ng-click="scanBarcode()">
+          Scan barcode
+        </a>
         <a class="item" ng-repeat="e in equipment" ng-click="clickEquipment(e)">
           <span ng-bind="e.id"></span>
           <span ng-bind="e.description"></span>
         </a>
       </div>
-    </ion-content>
+  </ion-content>
 </ion-view>
