@@ -1,5 +1,19 @@
-starter.controller("SearchCtrl", function($scope, $db, $rootScope, $state, nfcService) {
+starter.controller("SearchCtrl", function($scope, $db, $rootScope, $state, $timeout, nfcService) {
+    var promise = null;
+    $scope.search = { term: "" };
     $scope.trainees = $db.trainees();
+    $scope.clearSearch = function() {
+        console.log("clear");
+        $scope.search.term = "";
+    }
+    $scope.$watch("search.term", function(newValue, oldValue) {
+        if (promise != null) 
+            $timeout.cancel(promise);
+        promise = $timeout(function() {
+            $scope.trainees = _.filter($db.trainees(), function(i) { return _.includes(i.fullname.toUpperCase(), $scope.search.term.toUpperCase()); });
+            promise = null;
+        }, 300);
+    });
     $scope.$on("tag", function(event, data) {
         var lookup = $db.traineeByTagId(data.id);
         if (lookup != null)

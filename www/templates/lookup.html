@@ -4,13 +4,13 @@
           <div class="item-input-inset" style="line-height: 2em; padding: 0.25em 0.5em">
             <div class="item-input-wrapper">
               <i class="icon ion-ios-search placeholder-icon"></i>
-              <input type="search" style="width: 100%" placeholder="Search equipment">
+              <input type="search" style="width: 100%" placeholder="Search equipment" ng-model="search.term">
             </div>
           </div>
         </ion-nav-title> 
         <ion-nav-back-button></ion-nav-back-button>
         <ion-nav-buttons side="right">
-          <button class="button button-clear">Clear</button>
+          <button class="button button-clear" ng-click="clearSearch()">Clear</button>
         </ion-nav-buttons>
     </ion-nav-bar>
     <ion-content class="padding">

@@ -99,8 +99,22 @@ starter.controller("CheckoutCtrl", function($scope, $http, $db, $rootScope, $aut
     $scope.goBack = function() {
         $rootScope.$ionicGoBack();
     };
-}).controller("LookupCtrl", function($scope, $http, $db) {
+}).controller("LookupCtrl", function($scope, $http, $db, $timeout) {
+    var promise = null;
+    $scope.search = { term: ""};
     $scope.equipment = $db.allEquipment();
+    $scope.clearSearch = function() {
+        console.log("clear");
+        $scope.search.term = "";
+    }
+    $scope.$watch("search.term", function(newValue, oldValue) {
+        if (promise != null) 
+            $timeout.cancel(promise);
+        promise = $timeout(function() {
+            $scope.equipment = _.filter($db.allEquipment(), function(i) { return _.includes(i.description.toUpperCase(), $scope.search.term.toUpperCase()); });
+            promise = null;
+        }, 300);
+    });
 }).controller("FindTraineeCtrl", function($scope, $rootScope, $db, TraineeInfo) {
     $scope.trainees = $db.trainees();
     $scope.clickTrainee = function(trainee) {
