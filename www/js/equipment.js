@@ -10,10 +10,10 @@ starter.controller("CheckoutCtrl", function($scope, $http, $db, $rootScope, $aut
     TraineeInfo.clear();
     ItemInfo.clear();
     $scope.$on("tag", function(event, data) {
-        var lookup = $db.traineeByTagId(data.id);
-        if (lookup != null && lookup != $scope.checkout.trainee) {
-            $scope.$apply(function() {
-                $scope.checkout.trainee = lookup;
+        if ($scope.checkout.trainee == null || data.id != $scope.checkout.trainee.tag_id) {
+            $db.traineeByTagId(data.id).then(function(lookup) {
+                if (lookup != null) 
+                    $scope.checkout.trainee = lookup;
             });
         }
     });
@@ -54,27 +54,39 @@ starter.controller("CheckoutCtrl", function($scope, $http, $db, $rootScope, $aut
     $scope.$on("$ionicView.enter", function(){
       if (TraineeInfo.get() != null && $scope.checkin.trainee != TraineeInfo.get()) {
         $scope.checkin.trainee = TraineeInfo.get();
-        $scope.checkin.equipment = $db.equipmentWith(TraineeInfo.get().id);
-        TraineeInfo.clear();
-        ItemInfo.clear();
-        ItemInfo.setSelected(_.map($scope.checkin.equipment, function(i) { return i.id; }));
+        $db.equipmentWith(TraineeInfo.get().id).then(function(e) {
+            $scope.checkin.equipment = e;
+            TraineeInfo.clear();
+            ItemInfo.clear();
+            ItemInfo.setSelected(_.map($scope.checkin.equipment, function(i) { return i.id; }));
+        });
       }
       if (ItemInfo.get() != null) {
         $scope.checkin.equipment.push(ItemInfo.get());
-        if ($scope.checkin.trainee == null) 
-            $scope.checkin.trainee = ItemInfo.get().trainee;
+        if ($scope.checkin.trainee == null) {
+            $db.traineeById(ItemInfo.get().trainee).then(function(trainee) {
+                $scope.checkin.trainee = trainee;
+                $db.equipmentWith(trainee.id).then(function(e) {
+                    $scope.checkin.max_equipment_length = e.length;
+                });
+            });
+        }
         ItemInfo.clear();
         ItemInfo.setSelected(_.map($scope.checkin.equipment, function(i) { return i.id; }));
       }
     });
     $scope.$on("tag", function(event, data) {
-        var lookup = $db.traineeByTagId(data.id);
-        if (lookup != null && lookup != $scope.checkin.trainee) {
-            $scope.$apply(function() {
-                $scope.checkin.trainee = lookup;
-                $scope.checkin.equipment = $db.equipmentWith(lookup.id);
-                ItemInfo.clear();
-                ItemInfo.setSelected(_.map($scope.checkin.equipment, function(i) { return i.id; }));
+        if ($scope.checkin.trainee == null || data.id != $scope.checkin.trainee.tag_id) {
+            $db.traineeByTagId(data.id).then(function(lookup) {
+                if (lookup != null) {
+                    $scope.checkin.trainee = lookup;
+                    $db.equipmentWith(lookup.id).then(function(e) {
+                        $scope.checkin.max_equipment_length = e.length;
+                        $scope.checkin.equipment = e;
+                        ItemInfo.clear();
+                        ItemInfo.setSelected(_.map($scope.checkin.equipment, function(i) { return i.id; }));
+                    })
+                }
             });
         }
     });
@@ -90,7 +102,7 @@ starter.controller("CheckoutCtrl", function($scope, $http, $db, $rootScope, $aut
           return "all";
     };
     $scope.addSelection = function() {
-      return $scope.checkin.trainee == null || $scope.checkin.equipment.length < $db.equipmentWith($scope.checkin.trainee.id).length;
+      return $scope.checkin.trainee == null || $scope.checkin.equipment.length < $scope.checkin.max_equipment_length;
     };
     $scope.commit = function() {
         $scope.checkin.date = new Date();
@@ -121,31 +133,47 @@ starter.controller("CheckoutCtrl", function($scope, $http, $db, $rootScope, $aut
         }, 300);
     });
 }).controller("FindTraineeCtrl", function($scope, $rootScope, $db, TraineeInfo) {
-    $scope.trainees = $db.trainees();
+    $db.trainees().then(function(data) {
+        $scope.trainees = data;
+    });
     $scope.clickTrainee = function(trainee) {
         TraineeInfo.set(trainee);
         $rootScope.$ionicGoBack();
     };
+    $scope.$on("tag", function(event, data) {
+        $db.traineeByTagId(data.id).then(function(lookup) {
+            if (lookup != null) {
+                TraineeInfo.set(lookup);
+                $rootScope.$ionicGoBack();
+            }
+        });
+    });    
 }).controller("AddItemCtrl", function($scope, $rootScope, $stateParams, $db, ItemInfo, _) {
     if ($stateParams.dir == "in") {
         var equipment = [];
         if ($stateParams.trainee == "all")
-            equipment = $db.checkedOutEquipment();
+            $db.checkedOutEquipment().then(function(data) { equipment = data; });
         else
-            equipment = $db.equipmentWith($stateParams.trainee);
+            $db.equipmentWith($stateParams.trainee).then(function(data) { equipment = data; });
         $scope.equipment = _.reject(equipment, function(i) { return _.includes(ItemInfo.getSelected(), i.id); });
     }
     else {
-        $scope.equipment = _.reject($db.availableEquipment(), function(i) { return _.includes(ItemInfo.getSelected(), i.id); });
+        $db.availableEquipment().then(function(data) {
+            $scope.equipment = _.reject(data, function(i) { return _.includes(ItemInfo.getSelected(), i.id); });
+        });
     }
     $scope.clickEquipment = function(equipment) {
         ItemInfo.set(equipment);
         $rootScope.$ionicGoBack();
     };
 }).controller("StatusItemCtrl", function($scope, $db, $stateParams) {
-    $scope.item = $db.equipmentById($stateParams.id);
+    $db.equipmentById($stateParams.id).then(function(item) {
+        $scope.item = item;
+    });
 }).controller("HistoryCtrl", function($scope, $http, $db, $rootScope, $auth, TraineeInfo, ItemInfo, _) {
-    $scope.history = $db.history();
+    $db.history().then(function(data) {
+        $scope.history = data;
+    });
 });
 
 

@@ -19,12 +19,19 @@ starter.controller("SearchCtrl", function($scope, $db, $rootScope, $state, $time
         }, 300);
     });
     $scope.$on("tag", function(event, data) {
-        var lookup = $db.traineeByTagId(data.id);
-        if (lookup != null)
-            $state.go("app.trainee_info", {id: lookup.id});
+        $db.traineeByTagId(data.id).then(function(lookup) {
+            if (lookup != null)
+                $state.go("app.trainee_info", {id: lookup.id});
+        });
     });    
 }).controller("TraineeInfoCtrl", function($scope, $db, $stateParams) {
-    $scope.trainee = $db.traineeById($stateParams.id);
-    $scope.equipment = $db.equipmentWith($stateParams.id);
-    $scope.history = $db.historyByTrainee($stateParams.id);
+    $db.traineeById($stateParams.id).then(function(data) {
+        $scope.trainee = data;
+    });
+    $db.equipmentWith($stateParams.id).then(function(data) {
+        $scope.equipment = data;
+    });
+    $db.historyByTrainee($stateParams.id).then(function(data) {
+        $scope.history = data;
+    });
 });

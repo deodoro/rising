@@ -15,7 +15,7 @@
       </ion-nav-bar>
       <ion-content class="padding">
       <div class="list">
-        <a class="item" ng-repeat="t in trainees" ng-href="#/app/trainee_info/{{t.id}}">
+        <a class="item" ng-repeat="t in trainees" ng-href="#/app/trainee_info/{{t._id.$oid}}">
           <span ng-bind="t.fullname"></span>
         </a>
       </div>

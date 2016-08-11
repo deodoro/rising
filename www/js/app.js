@@ -272,72 +272,151 @@ starter.config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider
    }
 })
 .factory("$db", function($http, $q) {
-
-   var trainees = [{ "id": 0, "fullname": "Johnny Ng", "tag": "yellow", "tag_id": "84d3109e" }, { "id": 1, "fullname": "Ross Lee", "tag": "red", "tag_id": "e426109e" }, { "id": 2, "fullname": "Jose de Oliveira", "tag": "green", "tag_id": "448f0d9e" }];
-   var equipment = [{ "id": 0, "description": "E 1", status: "in" }, { "id": 1, "description": "E 2", status: "in" }, { "id": 2, "description": "E 3", status: "in" }, { "id": 3, "description": "E 4", status: "out", trainee: trainees[0], history: [{date: new Date(), record_type: "checked out", trainee: trainees[0], employee: "test"}]}, { "id": 4, "description": "E 5", status: "out", trainee: trainees[0] }, { "id": 5, "description": "E 6", status: "out", trainee: trainees[1] }];
-   var history = [{date: new Date(), record_type: "check out", trainee: trainees[0], employee: "test", equipment: [equipment[0]]}, {date: new Date(), record_type: "check in", trainee: trainees[0], employee: "test", equipment: [equipment[0]]}];
-
    return {
       allEquipment: function() {
         var d = $q.defer();        
         $http.get("http://www.deodoro.net:8080/rising/equipment").then(function(response) {
-            var data = response.data._embedded["rh:doc"];
-            d.resolve(data);
+            d.resolve(response.data._returned == 0 ? [] : response.data._embedded["rh:doc"]);
         });
         return d.promise;
       },
       availableEquipment: function() {
-        return _.filter(equipment, function(i) { return i.status == "in"; });
+        var d = $q.defer();        
+        $http.get("http://www.deodoro.net:8080/rising/equipment?filter={\"status\":{\"$eq\":\"in\"}}").then(function(response) {
+            d.resolve(response.data._returned == 0 ? [] : response.data._embedded["rh:doc"]);
+        });
+        return d.promise;
       },
       checkedOutEquipment: function() {
-        return _.filter(equipment, function(i) { return i.status == "out"; });
+        var d = $q.defer();        
+        $http.get("http://www.deodoro.net:8080/rising/equipment?filter={\"status\":{\"$eq\":\"out\"}}").then(function(response) {
+            d.resolve(response.data._returned == 0 ? [] : response.data._embedded["rh:doc"]);
+        });
+        return d.promise;
       },
       equipmentById: function(id) {
-        return _.find(equipment, function(i) { return i.id == id; })
+        var d = $q.defer();        
+        $http.get("http://www.deodoro.net:8080/rising/equipment/" + id).then(function(response) {
+            d.resolve(response.data);
+        });
+        return d.promise;
       },
       history: function() {
-        return history;
+        var d = $q.defer();        
+        $http.get("http://www.deodoro.net:8080/rising/history").then(function(response) {
+            if (response.data._returned > 0) {
+              d.resolve(response.data._embedded["rh:doc"]);
+            }
+            else
+              d.resolve([]);
+        });
+        return d.promise;
       },
       historyByTrainee: function(trainee_id) {
-        return _.filter(history, function(i) { return i.trainee.id == trainee_id; });
+        var d = $q.defer();        
+        this.history().then(function(data) {
+          d.resolve(_.filter(history, function(i) { return i.trainee == trainee_id; }));
+        });
+        return d.promise;
       },
       trainees: function() {
         var d = $q.defer();        
         $http.get("http://www.deodoro.net:8080/rising/trainee").then(function(response) {
-            var data = _.map(response.data._embedded["rh:doc"], function(i) {
-              i.fullname = i.first_name + " " + i.last_name;
-              return i;
-            });
-            d.resolve(data);
+            if (response.data._returned > 0) {
+              var data = _.map(response.data._embedded["rh:doc"], function(i) {
+                i.fullname = i.first_name + " " + i.last_name;
+                i.id = i._id.$oid;
+                return i;
+              });
+              d.resolve(data);
+            }
+            else
+              d.resolve([]);
         });
         return d.promise;
       },
       traineeById: function(id) {
-        return _.find(trainees, function(i) { return i.id == id; });
+        var d = $q.defer();        
+        $http.get("http://www.deodoro.net:8080/rising/trainee/" + id).then(function(response) {
+            var data = response.data;
+            data.fullname = data.first_name + " " + data.last_name;
+            data.id = data._id.$oid;
+            d.resolve(data);
+        });
+        return d.promise;
       }, 
       traineeByTagId: function(id) {
-        return _.find(trainees, function(i) { return i.tag_id == id; });
+        var d = $q.defer();        
+        $http.get("http://www.deodoro.net:8080/rising/trainee?filter={\"tag_id\":{\"$eq\":\"" + id + "\"}}").then(function(response) {
+            if (response.data._returned > 0) {
+              var data = response.data._embedded["rh:doc"][0];
+              data.fullname = data.first_name + " " + data.last_name;
+              data.id = data._id.$oid;
+              d.resolve(data);
+            }
+            else
+              d.resolve(null);
+        });
+        return d.promise;
       }, 
       equipmentWith: function(trainee_id) {
-        return _.filter(equipment, function(i) { return i.trainee && i.trainee.id == trainee_id; }) || [];
+        var d = $q.defer();        
+        $http.get("http://www.deodoro.net:8080/rising/equipment?filter={\"trainee\":{\"$eq\":\"" + trainee_id + "\"}}").then(function(response) {
+            d.resolve(response.data._returned == 0 ? [] : response.data._embedded["rh:doc"]);
+        });
+        return d.promise;
       },
       createCheckout: function(checkout, username) {
         checkout.equipment.forEach(function(i) {
-          i.status = "out";
-          i.history = i.history || [];
-          i.trainee = checkout.trainee;
-          i.history.push({ date: checkout.date, record_type: "checked out", trainee: checkout.trainee, employee: username });
-        });        
-        history.push({ record_type: "check out", date: checkout.date, notes: checkout.notes, equipment: checkout.equipment, trainee: checkout.trainee, employee: username })
+          i.history.push({ date: checkout.date, record_type: "checked out", trainee: { fullname: checkout.trainee.fullname }, employee: username });
+          $http({
+            url: "http://www.deodoro.net:8080/rising/equipment/" + i._id.$oid,
+            method: "PATCH",
+            data: {
+              status: "out",
+              history: i.history,
+              trainee: checkout.trainee.id
+            }
+          });
+        });
+        $http({
+          url: "http://www.deodoro.net:8080/rising/history",
+          method: "POST",
+          data: {
+            record_type: "check out",
+            date: checkout.date,
+            notes: checkout.notes,
+            equipment: _.map(checkout.equipment, function(i) { return { id: i.id, description: i.description}; }),
+            trainee: { fullname: checkout.trainee.fullname },
+            employee: username
+          }
+        });
       },
       createCheckin: function(checkin, username) {
         checkin.equipment.forEach(function(i) {
-          i.status = "in";
-          i.history = i.history || [];
-          i.trainee = null;
-          i.history.push({ date: checkin.date, record_type: "checked in", trainee: checkin.trainee, employee: username });
-          history.push({ record_type: "check in", date: checkin.date, notes: checkin.notes, equipment: checkin.equipment, trainee: checkin.trainee, employee: username })
+          i.history.push({ date: checkin.date, record_type: "checked in", trainee: { fullname: checkin.trainee.fullname }, employee: username });
+          $http({
+            url: "http://www.deodoro.net:8080/rising/equipment/" + i._id.$oid,
+            method: "PATCH",
+            data: {
+              status: "in",
+              history: i.history,
+              trainee: null
+            }
+          })
         });        
+        $http({
+          url: "http://www.deodoro.net:8080/rising/history",
+          method: "POST",
+          data: {
+            record_type: "check in",
+            date: checkin.date,
+            notes: checkin.notes,
+            equipment: _.map(checkin.equipment, function(i) { return { id: i.id, description: i.description}; }),
+            trainee: { fullname: checkin.trainee.fullname },
+            employee: username
+          }
+        });
       }
    }
 })
