@@ -1,4 +1,5 @@
 starter.controller("CheckoutCtrl", function($scope, $http, $db, $rootScope, $auth, TraineeInfo, ItemInfo, _, nfcService) {
+
     $scope.checkout = {
         'trainee': null,
         'equipment': [],
@@ -102,7 +103,9 @@ starter.controller("CheckoutCtrl", function($scope, $http, $db, $rootScope, $aut
 }).controller("LookupCtrl", function($scope, $http, $db, $timeout) {
     var promise = null;
     $scope.search = { term: ""};
-    $scope.equipment = $db.allEquipment();
+    $db.allEquipment().then(function(data) {
+        $scope.equipment = data;
+    });
     $scope.clearSearch = function() {
         console.log("clear");
         $scope.search.term = "";
@@ -111,7 +114,9 @@ starter.controller("CheckoutCtrl", function($scope, $http, $db, $rootScope, $aut
         if (promise != null) 
             $timeout.cancel(promise);
         promise = $timeout(function() {
-            $scope.equipment = _.filter($db.allEquipment(), function(i) { return _.includes(i.description.toUpperCase(), $scope.search.term.toUpperCase()); });
+            $db.allEquipment().then(function(data) {                
+                $scope.equipment = _.filter(data, function(i) { return _.includes(i.description.toUpperCase(), $scope.search.term.toUpperCase()); });
+            });
             promise = null;
         }, 300);
     });

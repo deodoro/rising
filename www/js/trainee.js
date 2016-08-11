@@ -1,7 +1,9 @@
 starter.controller("SearchCtrl", function($scope, $db, $rootScope, $state, $timeout, nfcService) {
     var promise = null;
     $scope.search = { term: "" };
-    $scope.trainees = $db.trainees();
+    $db.trainees().then(function(data) {
+        $scope.trainees = data;
+    });
     $scope.clearSearch = function() {
         console.log("clear");
         $scope.search.term = "";
@@ -10,7 +12,9 @@ starter.controller("SearchCtrl", function($scope, $db, $rootScope, $state, $time
         if (promise != null) 
             $timeout.cancel(promise);
         promise = $timeout(function() {
-            $scope.trainees = _.filter($db.trainees(), function(i) { return _.includes(i.fullname.toUpperCase(), $scope.search.term.toUpperCase()); });
+            $db.trainees().then(function(data) {
+                $scope.trainees = _.filter(data, function(i) { return _.includes(i.fullname.toUpperCase(), $scope.search.term.toUpperCase()); });
+            });
             promise = null;
         }, 300);
     });

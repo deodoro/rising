@@ -163,7 +163,10 @@ starter.config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider
 
   $urlRouterProvider.otherwise("/app/equipment");
 })
-.run(function($ionicPlatform) {
+.run(function($ionicPlatform, $http) {
+
+  $http.defaults.headers.common["Authorization"] = "Basic YWRtaW46Y2hhbmdlaXQ=";
+
   $ionicPlatform.ready(function() {
     if(window.cordova && window.cordova.plugins.Keyboard) {
       cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
@@ -212,7 +215,7 @@ starter.config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider
         }
     };
 })
-.factory("$db", function() {
+.factory("$mock_db", function() {
    var trainees = [{ "id": 0, "fullname": "Johnny Ng", "tag": "yellow", "tag_id": "84d3109e" }, { "id": 1, "fullname": "Ross Lee", "tag": "red", "tag_id": "e426109e" }, { "id": 2, "fullname": "Jose de Oliveira", "tag": "green", "tag_id": "448f0d9e" }];
    var equipment = [{ "id": 0, "description": "E 1", status: "in" }, { "id": 1, "description": "E 2", status: "in" }, { "id": 2, "description": "E 3", status: "in" }, { "id": 3, "description": "E 4", status: "out", trainee: trainees[0], history: [{date: new Date(), record_type: "checked out", trainee: trainees[0], employee: "test"}]}, { "id": 4, "description": "E 5", status: "out", trainee: trainees[0] }, { "id": 5, "description": "E 6", status: "out", trainee: trainees[1] }];
    var history = [{date: new Date(), record_type: "check out", trainee: trainees[0], employee: "test", equipment: [equipment[0]]}, {date: new Date(), record_type: "check in", trainee: trainees[0], employee: "test", equipment: [equipment[0]]}];
@@ -238,6 +241,76 @@ starter.config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider
       },
       trainees: function() {
         return trainees;
+      },
+      traineeById: function(id) {
+        return _.find(trainees, function(i) { return i.id == id; });
+      }, 
+      traineeByTagId: function(id) {
+        return _.find(trainees, function(i) { return i.tag_id == id; });
+      }, 
+      equipmentWith: function(trainee_id) {
+        return _.filter(equipment, function(i) { return i.trainee && i.trainee.id == trainee_id; }) || [];
+      },
+      createCheckout: function(checkout, username) {
+        checkout.equipment.forEach(function(i) {
+          i.status = "out";
+          i.history = i.history || [];
+          i.trainee = checkout.trainee;
+          i.history.push({ date: checkout.date, record_type: "checked out", trainee: checkout.trainee, employee: username });
+        });        
+        history.push({ record_type: "check out", date: checkout.date, notes: checkout.notes, equipment: checkout.equipment, trainee: checkout.trainee, employee: username })
+      },
+      createCheckin: function(checkin, username) {
+        checkin.equipment.forEach(function(i) {
+          i.status = "in";
+          i.history = i.history || [];
+          i.trainee = null;
+          i.history.push({ date: checkin.date, record_type: "checked in", trainee: checkin.trainee, employee: username });
+          history.push({ record_type: "check in", date: checkin.date, notes: checkin.notes, equipment: checkin.equipment, trainee: checkin.trainee, employee: username })
+        });        
+      }
+   }
+})
+.factory("$db", function($http, $q) {
+
+   var trainees = [{ "id": 0, "fullname": "Johnny Ng", "tag": "yellow", "tag_id": "84d3109e" }, { "id": 1, "fullname": "Ross Lee", "tag": "red", "tag_id": "e426109e" }, { "id": 2, "fullname": "Jose de Oliveira", "tag": "green", "tag_id": "448f0d9e" }];
+   var equipment = [{ "id": 0, "description": "E 1", status: "in" }, { "id": 1, "description": "E 2", status: "in" }, { "id": 2, "description": "E 3", status: "in" }, { "id": 3, "description": "E 4", status: "out", trainee: trainees[0], history: [{date: new Date(), record_type: "checked out", trainee: trainees[0], employee: "test"}]}, { "id": 4, "description": "E 5", status: "out", trainee: trainees[0] }, { "id": 5, "description": "E 6", status: "out", trainee: trainees[1] }];
+   var history = [{date: new Date(), record_type: "check out", trainee: trainees[0], employee: "test", equipment: [equipment[0]]}, {date: new Date(), record_type: "check in", trainee: trainees[0], employee: "test", equipment: [equipment[0]]}];
+
+   return {
+      allEquipment: function() {
+        var d = $q.defer();        
+        $http.get("http://www.deodoro.net:8080/rising/equipment").then(function(response) {
+            var data = response.data._embedded["rh:doc"];
+            d.resolve(data);
+        });
+        return d.promise;
+      },
+      availableEquipment: function() {
+        return _.filter(equipment, function(i) { return i.status == "in"; });
+      },
+      checkedOutEquipment: function() {
+        return _.filter(equipment, function(i) { return i.status == "out"; });
+      },
+      equipmentById: function(id) {
+        return _.find(equipment, function(i) { return i.id == id; })
+      },
+      history: function() {
+        return history;
+      },
+      historyByTrainee: function(trainee_id) {
+        return _.filter(history, function(i) { return i.trainee.id == trainee_id; });
+      },
+      trainees: function() {
+        var d = $q.defer();        
+        $http.get("http://www.deodoro.net:8080/rising/trainee").then(function(response) {
+            var data = _.map(response.data._embedded["rh:doc"], function(i) {
+              i.fullname = i.first_name + " " + i.last_name;
+              return i;
+            });
+            d.resolve(data);
+        });
+        return d.promise;
       },
       traineeById: function(id) {
         return _.find(trainees, function(i) { return i.id == id; });
