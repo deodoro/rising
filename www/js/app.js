@@ -8,7 +8,10 @@ angular.module('lodash', [])
 
 var starter = angular.module('starter', ['ionic', 'ngCordova', 'lodash']);
 
-starter.config(function($stateProvider, $urlRouterProvider) {
+starter.config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider) {
+
+  $ionicConfigProvider.tabs.position('bottom'); 
+
   $stateProvider
     .state('app', {
       url: "/app",
@@ -59,27 +62,19 @@ starter.config(function($stateProvider, $urlRouterProvider) {
         }
       }
     })
-    .state('app.trainee', {
-      url: "/trainee",
-      views: {
-        'trainee-tab': {
-          templateUrl: "templates/trainee.html"
-        }
-      }
-    })
     .state('app.search', {
-      url: "/trainee/search",
+      url: "/equipment/search",
       views: {
-        'trainee-tab': {
+        'equipment-tab': {
           templateUrl: "templates/search.html",
           controller: "SearchCtrl"
         }
       }
     })
     .state('app.read-card', {
-      url: "/trainee/read_card",
+      url: "/equipment/read_card",
       views: {
-        'trainee-tab': {
+        'equipment-tab': {
           templateUrl: "templates/read_card.html",
           controller: "ReadCtrl"
         }
@@ -159,7 +154,7 @@ starter.config(function($stateProvider, $urlRouterProvider) {
     .state('app.trainee_info', {
       url: "/trainee_info/:id",
       views: {
-        'trainee-tab': {
+        'equipment-tab': {
           templateUrl: "templates/trainee_info.html",
           controller: "TraineeInfoCtrl"
         }
@@ -276,4 +271,19 @@ starter.config(function($stateProvider, $urlRouterProvider) {
       return "Johnny Ng";
     }
   };
+})    
+.factory('nfcService', function ($rootScope, $ionicPlatform) {
+    var tag = null;
+
+    $ionicPlatform.ready(function() {
+        nfc.addTagDiscoveredListener(function(e) {
+            var x = nfc.bytesToHexString(e.tag.id);
+            $rootScope.$apply(function() {
+                tag = x;
+            });
+            $rootScope.$broadcast("tag", {id: x});
+        });
+    });
+
+    return { };
 });

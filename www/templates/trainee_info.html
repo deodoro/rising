@@ -12,18 +12,17 @@
             <span class="input-label">Name</span>
             <span ng-bind="trainee.fullname"></span>
         </div>
-    </div>
-    <div class="list card" ng-repeat="h in history">
-        <div class="item item-divider">
-            <span>{{ h.date | date:'short' }}</span>&nbsp;<span ng-bind="h.record_type" ng-class="{ calm: h.record_type == 'check out',  assertive: h.record_type == 'check in' }"></span>
-        </div>
+        <div class="list card" ng-repeat="h in history">
+            <div class="item item-divider">
+                <span>{{ h.date | date:'short' }}</span>&nbsp;<span ng-bind="h.record_type" ng-class="{ calm: h.record_type == 'check out',  assertive: h.record_type == 'check in' }"></span>
+            </div>
 
-        <div class="item">
-            <div ng-repeat="i in h.equipment"><span ng-bind="i.id"></span>&nbsp;<span ng-bind="i.description"></span></div>
+            <div class="item">
+                <div ng-repeat="i in h.equipment"><span ng-bind="i.id"></span>&nbsp;<span ng-bind="i.description"></span></div>
+            </div>
+            <div class="item item-text-wrap" ng-show="h.notes"><span ng-bind="h.notes"></span></div>
+            <div class="item item-divider">registered by <span ng-bind="h.employee"></span></div>
         </div>
-        <div class="item item-text-wrap" ng-show="h.notes"><span ng-bind="h.notes"></span></div>
-        <div class="item item-divider">registered by <span ng-bind="h.employee"></span></div>
-    </div>
-</div>
-</ion-content>
+      </div>
+    </ion-content>
 </ion-view>

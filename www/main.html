@@ -40,6 +40,9 @@
         <ion-tab title="Equipment" icon="ion-ios-americanfootball" href="#/app/equipment">
           <ion-nav-view name="equipment-tab"></ion-nav-view>
         </ion-tab>
+        <ion-tab title="Trainee" icon="ion-happy" href="#/app/trainee">
+          <ion-nav-view name="trainee-tab"></ion-nav-view>
+        </ion-tab>
         <ion-tab title="Employee" icon="ion-ribbon-b" href="#/app/employee">
           <ion-nav-view name="employee-tab"></ion-nav-view>
         </ion-tab>
@@ -51,9 +54,16 @@
           <ion-content class="padding">
               <a href="#/app/equipment/checkout" class="button icon-left ion-ios-redo button-full button-calm">Check out</a>
               <a href="#/app/equipment/checkin" class="button icon-left ion-ios-undo button-full button-assertive">Check in</a>
-              <a href="#/app/equipment/search" class="button icon-left ion-card button-full button-balanced">Look up trainee</a>
-              <a href="#/app/equipment/lookup" class="button icon-left ion-search button-full button-energized">Look up equipment</a>
-              <a href="#/app/equipment/history" class="button icon-left ion-clipboard button-full button-royal">Transaction history</a>
+              <a href="#/app/equipment/lookup" class="button icon-left ion-search button-full button-energized">Look up</a>
+              <a href="#/app/equipment/history" class="button icon-left ion-clipboard button-full button-royal">History</a>
+          </ion-content>
+      </ion-view>
+    </script>
+
+    <script id="templates/trainee.html" type="text/ng-template">
+      <ion-view view-title="Trainee">
+          <ion-content class="padding">
+              <a href="#/app/trainee/search" class="button icon-left ion-search button-full button-royal">Look up</a>
           </ion-content>
       </ion-view>
     </script>
@@ -77,5 +87,3 @@
     </script>
   </body>
 </html>
-
-

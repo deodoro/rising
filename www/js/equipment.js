@@ -1,4 +1,9 @@
-starter.controller("CheckoutCtrl", function($scope, $http, $db, $rootScope, $auth, TraineeInfo, ItemInfo, _) {
+starter.controller("CheckoutCtrl", function($scope, $http, $db, $rootScope, $auth, TraineeInfo, ItemInfo, _, nfcService) {
+
+    $scope.$on("tag", function(event, data) {
+        alert(JSON.stringify(data));
+    });
+
     $scope.checkout = {
         'trainee': null,
         'equipment': [],
