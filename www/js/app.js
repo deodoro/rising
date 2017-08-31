@@ -272,38 +272,40 @@ starter.config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider
    }
 })
 .factory("$db", function($http, $q) {
+   var server_url = "localhost:8080";
+   
    return {
       allEquipment: function() {
         var d = $q.defer();        
-        $http.get("http://www.deodoro.net:8080/rising/equipment").then(function(response) {
+        $http.get("http://" + server_url + "/rising/equipment").then(function(response) {
             d.resolve(response.data._returned == 0 ? [] : response.data._embedded["rh:doc"]);
         });
         return d.promise;
       },
       availableEquipment: function() {
         var d = $q.defer();        
-        $http.get("http://www.deodoro.net:8080/rising/equipment?filter={\"status\":{\"$eq\":\"in\"}}").then(function(response) {
+        $http.get("http://" + server_url + "/rising/equipment?filter={\"status\":{\"$eq\":\"in\"}}").then(function(response) {
             d.resolve(response.data._returned == 0 ? [] : response.data._embedded["rh:doc"]);
         });
         return d.promise;
       },
       checkedOutEquipment: function() {
         var d = $q.defer();        
-        $http.get("http://www.deodoro.net:8080/rising/equipment?filter={\"status\":{\"$eq\":\"out\"}}").then(function(response) {
+        $http.get("http://" + server_url + "/rising/equipment?filter={\"status\":{\"$eq\":\"out\"}}").then(function(response) {
             d.resolve(response.data._returned == 0 ? [] : response.data._embedded["rh:doc"]);
         });
         return d.promise;
       },
       equipmentById: function(id) {
         var d = $q.defer();        
-        $http.get("http://www.deodoro.net:8080/rising/equipment/" + id).then(function(response) {
+        $http.get("http://" + server_url + "/rising/equipment/" + id).then(function(response) {
             d.resolve(response.data);
         });
         return d.promise;
       },
       history: function() {
         var d = $q.defer();        
-        $http.get("http://www.deodoro.net:8080/rising/history").then(function(response) {
+        $http.get("http://" + server_url + "/rising/history").then(function(response) {
             if (response.data._returned > 0) {
               d.resolve(response.data._embedded["rh:doc"]);
             }
@@ -321,7 +323,7 @@ starter.config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider
       },
       trainees: function() {
         var d = $q.defer();        
-        $http.get("http://www.deodoro.net:8080/rising/trainee").then(function(response) {
+        $http.get("http://" + server_url + "/rising/trainee").then(function(response) {
             if (response.data._returned > 0) {
               var data = _.map(response.data._embedded["rh:doc"], function(i) {
                 i.fullname = i.first_name + " " + i.last_name;
@@ -337,7 +339,7 @@ starter.config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider
       },
       traineeById: function(id) {
         var d = $q.defer();        
-        $http.get("http://www.deodoro.net:8080/rising/trainee/" + id).then(function(response) {
+        $http.get("http://" + server_url + "/rising/trainee/" + id).then(function(response) {
             var data = response.data;
             data.fullname = data.first_name + " " + data.last_name;
             data.id = data._id.$oid;
@@ -347,7 +349,7 @@ starter.config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider
       }, 
       traineeByTagId: function(id) {
         var d = $q.defer();        
-        $http.get("http://www.deodoro.net:8080/rising/trainee?filter={\"tag_id\":{\"$eq\":\"" + id + "\"}}").then(function(response) {
+        $http.get("http://" + server_url + "/rising/trainee?filter={\"tag_id\":{\"$eq\":\"" + id + "\"}}").then(function(response) {
             if (response.data._returned > 0) {
               var data = response.data._embedded["rh:doc"][0];
               data.fullname = data.first_name + " " + data.last_name;
@@ -361,7 +363,7 @@ starter.config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider
       }, 
       equipmentWith: function(trainee_id) {
         var d = $q.defer();        
-        $http.get("http://www.deodoro.net:8080/rising/equipment?filter={\"trainee\":{\"$eq\":\"" + trainee_id + "\"}}").then(function(response) {
+        $http.get("http://" + server_url + "/rising/equipment?filter={\"trainee\":{\"$eq\":\"" + trainee_id + "\"}}").then(function(response) {
             d.resolve(response.data._returned == 0 ? [] : response.data._embedded["rh:doc"]);
         });
         return d.promise;
@@ -370,7 +372,7 @@ starter.config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider
         checkout.equipment.forEach(function(i) {
           i.history.push({ date: checkout.date, record_type: "checked out", trainee: { fullname: checkout.trainee.fullname }, employee: username });
           $http({
-            url: "http://www.deodoro.net:8080/rising/equipment/" + i._id.$oid,
+            url: "http://" + server_url + "/rising/equipment/" + i._id.$oid,
             method: "PATCH",
             data: {
               status: "out",
@@ -380,7 +382,7 @@ starter.config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider
           });
         });
         $http({
-          url: "http://www.deodoro.net:8080/rising/history",
+          url: "http://" + server_url + "/rising/history",
           method: "POST",
           data: {
             record_type: "check out",
@@ -396,7 +398,7 @@ starter.config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider
         checkin.equipment.forEach(function(i) {
           i.history.push({ date: checkin.date, record_type: "checked in", trainee: { fullname: checkin.trainee.fullname }, employee: username });
           $http({
-            url: "http://www.deodoro.net:8080/rising/equipment/" + i._id.$oid,
+            url: "http://" + server_url + "/rising/equipment/" + i._id.$oid,
             method: "PATCH",
             data: {
               status: "in",
@@ -406,7 +408,7 @@ starter.config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider
           })
         });        
         $http({
-          url: "http://www.deodoro.net:8080/rising/history",
+          url: "http://" + server_url + "/rising/history",
           method: "POST",
           data: {
             record_type: "check in",
